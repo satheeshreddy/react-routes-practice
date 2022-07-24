@@ -1,24 +1,42 @@
 import { Link, Route, useParams, useRouteMatch } from "react-router-dom";
 import Comments from "../components/comments/Comments";
 import HighlightedQuote from "../components/quotes/HighlightedQuote";
+import LoadingSpinner from "../components/UI/LoadingSpinner";
 
-const DUMMY_QUOTES = [
-  {
-    id: 1,
-    text: "I'm not a great programmer; I'm just a good programmer with great habits.",
-    author: "Kent Beck",
-  },
-  {
-    id: 2,
-    text: "First, solve the problem. Then, write the code.",
-    author: "John Johnson",
-  },
-];
+import useHttp from "../hooks/use-http";
+import { useEffect } from "react";
+import { getSingleQuote } from "../lib/api";
+
 const QuoteDetails = () => {
   const { id } = useParams();
   const match = useRouteMatch();
-  const quote = DUMMY_QUOTES.find((quote) => quote.id === +id);
-  if (!quote) {
+
+  const {
+    sendRequest,
+    status,
+    data: quote,
+    erro,
+  } = useHttp(getSingleQuote, true);
+  useEffect(() => {
+    sendRequest(id);
+  }, [sendRequest, id]);
+
+  if (status === "pending") {
+    return (
+      <div className="centered">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+  if (status === "error") {
+    return (
+      <div className="centered focused">
+        <p>{erro}</p>
+      </div>
+    );
+  }
+
+  if (!quote.text) {
     return <div>Quote not found</div>;
   }
   return (

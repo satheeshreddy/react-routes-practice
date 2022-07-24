@@ -1,10 +1,7 @@
 import React from "react";
-import { ReactDOM } from "react";
 import { Formik, Form, useField } from "formik";
 import * as Yup from "yup";
-import { Prompt } from "react-router-dom";
 import Card from "../UI/Card";
-import LoadingSpinner from "../UI/LoadingSpinner";
 import classes from "./QuoteForm.module.css";
 
 const MyTextInput = ({ label, ...props }) => {
@@ -33,22 +30,11 @@ const MyTextArea = ({ label, ...props }) => {
   );
 };
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 const QuoteForm = (props) => {
-  const [isEntering, setEntering] = React.useState(false);
-  const formFocusHandler = () => {
-    console.log("Form focused");
-    setEntering(true);
-  };
-  const isEnteringHadler = () => {
-    console.log("Form blurred");
-    setEntering(false);
-  };
   return (
     <>
-      <Prompt
-        when={isEntering}
-        message={(location) => "Are you sure you want to leave?"}
-      />
       <Card>
         <Formik
           initialValues={{
@@ -63,22 +49,15 @@ const QuoteForm = (props) => {
               .max(140, "Must be 140 characters or less")
               .required("Text is required"),
           })}
-          onSubmit={(values, { setSubmitting }) => {
+          onSubmit={async (values, { setSubmitting }) => {
             setSubmitting(true);
             props.onAddQuote({ ...values });
-
+            await sleep(1000); // simulate server latency
             setSubmitting(false);
           }}
         >
-          {({ isSubmitting, touched }) => (
+          {({ isSubmitting }) => (
             <Form>
-              {props.isLoading && (
-                <div className={classes.loading}>
-                  <LoadingSpinner />
-                </div>
-              )}
-              {(touched.author || touched.text) && formFocusHandler()}
-              {isSubmitting && isEnteringHadler()}
               <div className={classes.control}>
                 <MyTextInput label="Author" name="author" type="text" />
               </div>
@@ -87,7 +66,7 @@ const QuoteForm = (props) => {
               </div>
               <div className={classes.actions}>
                 <button type="submit" className="btn" disabled={isSubmitting}>
-                  Add Quote
+                  {isSubmitting ? "Please wait..." : "Add Quote"}
                 </button>
               </div>
             </Form>

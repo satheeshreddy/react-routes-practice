@@ -21,13 +21,14 @@ const QuoteList = (props) => {
   const isSortAscending = urlParams.get("sort") === "asc";
   const sortedQuotes = sortQuotes(props.quotes, isSortAscending);
   const changeSortingHandler = () => {
-    history.push(
-      `${location.pathname}?sort=${isSortAscending ? "desc" : "asc"}`
-    );
+    history.push({
+      pathname: `${location.pathname}`,
+      search: `?sort=${isSortAscending ? "desc" : "asc"}`,
+    });
   };
   return (
     <Fragment>
-      <div className={classes.sorting}>
+      <div className={classes.sorting}> 
         <button onClick={changeSortingHandler}>
           Sort {isSortAscending ? "descending" : "ascending"}
         </button>
