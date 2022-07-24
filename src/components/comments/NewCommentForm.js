@@ -29,7 +29,7 @@
 // export default NewCommentForm;
 
 import React, { useEffect } from "react";
-import { Formik, Form, useField, yupToFormErrors } from "formik";
+import { Formik, Form, useField } from "formik";
 import * as Yup from "yup";
 
 import classes from "./NewCommentForm.module.css";
